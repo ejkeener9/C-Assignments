@@ -1,4 +1,5 @@
 // Author: Emily Keener
+// Work in Progress!
 // Test 2
 // Flight company needs a program to show a menu of 3 flights, their number, day, and time.
 // Use a function to display menu and another to check if there are seats available. 
