@@ -1,12 +1,11 @@
 // Author: Emily Keener
-// Work in progress!
-// Test 2
+// Test 2 - Work in progress!
 // Flight company needs a program to show a menu of 3 flights, their number, day, and time.
+// Each Flight holds up to 15 passengers
 // Use a function to display menu and another to check if there are seats available. 
 
 #include "stdafx.h"
 #include <iostream>
-
 using namespace System;
 
 // Function prototypes
@@ -14,8 +13,9 @@ void company(); // Prints company header
 void schedule(int flights[]); // Prints updated schedule
 int getFlight(int f); // Get user flight input
 int menu(int f, int flights[]); // Menu which includes schedule() and getFlight() calls
-int checkFlight(int f, int flights[], int counter, int passengers[], int r); // Checks if flight is full / available
+int checkFlight(int f, int flights[], int counter, int passengers[]); // Checks if flight is full / available
 
+// Begin Main()
 int main()
 {
 	// Set console to black text / white background
@@ -23,8 +23,8 @@ int main()
 
 	//int flights[3] = {12,15,5}; // test flights
 	int flights[] = {0,0,0};
-	int passengers[30]; // stores passenger choices in order for report #2
-	int f, r; // user input for flight # and report type
+	int passengers[45]; // stores passenger choices in order for report #2
+	int f; // user input for flight number
 	bool quit = false; // quits menu loop
 	char exit; // user input to quit program
 	int counter = 0; // number of passengers entered
@@ -32,26 +32,40 @@ int main()
 	while(quit == false) // quit condition to end program
 	{
 		f = menu(f, flights); // updates user input variable
-		counter = checkFlight(f, flights, counter, passengers,r); // checks if flight is available or full
+		counter = checkFlight(f, flights, counter, passengers); // checks if flight is available or full
 
+		bool validate = false; // validates Quit input
 		// Quit program check
-		printf("Would you like to exit? [Y/N]\n");
-		scanf("%c%c", &exit);
-		if(exit == 'y' || exit == 'Y')
+		while(validate == false)
 		{
-			quit = true;
+			printf("Would you like to exit? [Y/N]\n");
+			scanf("%c%c", &exit);
+			if(exit == 'y' || exit == 'Y')
+			{
+				validate = true;
+				quit = true;
+			}
+			else if(exit == 'n' || exit == 'N')
+			{
+				validate = true;
+			}
+			else{
+				printf("Please enter Y for Yes or N for No.\n");
+			}
 		}
 	}
-}
+} // end Main
 
+// Begin company()
 void company() // Prints Company header
 {
 	system("cls"); // clear screen
 	printf("-----------------------------------------------------------\n");
 	printf("\t* F A S T   F L I G H T   A I R L I N E S * \n");
 	printf("-----------------------------------------------------------\n");
-}
+} //end company()
 
+// Begin schedule()
 void schedule(int flights[]) // Prints updated schedule
 {
 	printf("\t\tF L I G H T   S C H E D U L E\n");
@@ -72,75 +86,102 @@ void schedule(int flights[]) // Prints updated schedule
 			printf("     FULL");
 		else
 			printf("     %d", 15-flights[2]);
-}
+}// end schedule()
 
+// Begin getFlight()
 int getFlight(int f) // Get user flight input
 {
-	printf("\n\n\tChoose a flight: ");
+	printf("\n\nChoose a flight: ");
 	scanf("%d%c", &f);
 	printf("You selected flight %d\n", f);
 	return f;
-}
+} // end getFlight()
 
+// Begin menu()
 int menu(int f, int flights[]) // Menu function
 {
 	company();
 	schedule(flights);
 	f = getFlight(f);
 	return f;
-}
+} // end menu()
 
-
-int checkFlight(int f, int flights[], int counter, int passengers[], int r)
+// Begin checkFlight()
+int checkFlight(int f, int flights[], int counter, int passengers[]) // validates number of passengers
 {
-	company();
-	if(flights[(f-1)]<15)
+	bool validate = false;
+	company(); // Print company header
+	if(flights[(f-1)]<15) // flight can only hold 15 passengers
 	{
-		char reserve;
-		printf("Seat %d is availible. Would you like to reserve this seat? [Y/N]\n", (flights[(f-1)])+1);
-		scanf("%c%c",&reserve);
-		if(reserve == 'y' || reserve == 'Y')
+		char input; // input variable to check if user would like to reserve a seat on chosen flight
+		while(validate == false)
 		{
-			passengers[counter] = f;
-			flights[(f-1)]++;
-			printf("You have reserved seat %d on Flight %d.\n", flights[(f-1)],f);
-			printf("Please choose a report style: \n\t[1] Report by Flight choice     [2] Report by Passenger number\n Report: ");
-			scanf("%d%c", &r);
-			switch(r)
+			printf("Seat %d is availible. Would you like to reserve this seat? [Y/N]\n", (flights[(f-1)])+1);
+			scanf("%c%c",&input);
+			if(input == 'y' || input == 'Y') // user wants to reserve flight
 			{
-			case 1:
-				printf("Flight Choice\t Passenger Number\n");
-				for(int i=0;i<counter+1;i++)
+				validate = true;
+				passengers[counter] = f; // updates passengers[] which stores flight choices in order
+				flights[(f-1)]++; // increases total number of passengers on chosen flight
+				printf("You have reserved seat %d on Flight %d.\n", flights[(f-1)],f); // prints choice
+
+				// Infinite loop here
+				bool validateReport = false; // validate report choice
+				// Validate report choice
+				while(validateReport == false)
 				{
-					if(passengers[i] == 1)
+					validateReport = false;
+					printf("Please choose a report style: \n\t[1] Report by Flight choice     [2] Report by Passenger number\n Report: ");
+					scanf("%d%c", &input);
+					switch(input)
 					{
-						printf("Flight %d\t %d\n",1, i+1);
+					case 1:
+						printf("Flight Choice\t Passenger Number\n");
+						for(int i=0;i<counter+1;i++)
+						{
+							if(passengers[i] == 1)
+							{
+								printf("Flight %d\t %d\n",1, i+1);
+							}
+						}
+						for(int i=0;i<counter+1;i++)
+						{
+							if(passengers[i] == 2)
+							{
+								printf("Flight %d\t %d\n",2, i+1);
+							}
+						}
+						for(int i=0;i<counter+1;i++)
+						{
+							if(passengers[i] == 3)
+							{
+								printf("Flight %d\t %d\n",3, i+1);
+							}
+						}
+						validateReport = true;
+						break;
+					case 2: 
+						printf("Passenger Number\t Flight Choice\n");
+						for(int i=0;i<counter+1;i++)
+						{
+							printf("%d\t\t\t Flight %d\n",i+1, passengers[i]);
+						}
+						validateReport = true;
+						break;
+					// catch invalid input
+					default: printf("Please enter 1 or 2 only."); break;
 					}
 				}
-				for(int i=0;i<counter+1;i++)
-				{
-					if(passengers[i] == 2)
-					{
-						printf("Flight %d\t %d\n",2, i+1);
-					}
-				}
-				for(int i=0;i<counter+1;i++)
-				{
-					if(passengers[i] == 3)
-					{
-						printf("Flight %d\t %d\n",3, i+1);
-					}
-				}
-				break;
-			case 2: 
-				printf("Passenger Number\t Flight Choice\n");
-				for(int i=0;i<counter+1;i++)
-				{
-					printf("%d\t\t\t Flight %d\n",i+1, passengers[i]);
-				}
-				break;
+				counter++;
 			}
-			counter++;
+			else if((input == 'n') || (input == 'N'))
+			{
+				validate = true;
+			}
+			else
+			{
+				printf("Please enter Y for Yes or N for No.\n");
+			}
 		}
 	}
 	else
@@ -148,4 +189,4 @@ int checkFlight(int f, int flights[], int counter, int passengers[], int r)
 		printf("This flight is full\n");
 	}
 	return counter;
-}
+} // end checkFlight()
