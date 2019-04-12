@@ -1,5 +1,5 @@
 // Author: Emily Keener
-// Work in Progress!
+// Work in progress!
 // Test 2
 // Flight company needs a program to show a menu of 3 flights, their number, day, and time.
 // Use a function to display menu and another to check if there are seats available. 
@@ -10,30 +10,31 @@
 using namespace System;
 
 // Function prototypes
-void company();
-void schedule(int flights[]);
-int getFlight(int f);
-int menu(int f, int flights[]);
-void checkFlight(int f, int flights[], int counter, int passengers[], int r);
+void company(); // Prints company header
+void schedule(int flights[]); // Prints updated schedule
+int getFlight(int f); // Get user flight input
+int menu(int f, int flights[]); // Menu which includes schedule() and getFlight() calls
+void checkFlight(int f, int flights[], int counter, int passengers[], int r); // Checks if flight is full / available
 
 int main()
 {
 	// Set console to black text / white background
     system("color f0");
 
-	// int flights[3] = {12,15,5}; // test flights
-	int flights[3] = {0,0,0};
-	int passengers[30];
+	int flights[3] = {12,15,5}; // test flights
+	//int flights[] = {0,0,0};
+	int passengers[30]; // stores passenger choices in order for report #2
 	int f, r; // user input for flight # and report type
 	bool quit = false; // quits menu loop
 	char exit; // user input to quit program
 	int counter = 0; // number of passengers entered
 
-	//checkFlight(menu());
-	while(quit == false)
+	while(quit == false) // quit condition to end program
 	{
-		f = menu(f, flights);
-		checkFlight(f, flights, counter, passengers,r);
+		f = menu(f, flights); // updates user input variable
+		checkFlight(f, flights, counter, passengers,r); // checks if flight is available or full
+
+		// Quit program check
 		printf("Would you like to exit? [Y/N]\n");
 		scanf("%c%c", &exit);
 		if(exit == 'y' || exit == 'Y')
@@ -41,10 +42,9 @@ int main()
 			quit = true;
 		}
 	}
-	//system("pause");
 }
 
-void company()
+void company() // Prints Company header
 {
 	system("cls"); // clear screen
 	printf("-----------------------------------------------------------\n");
@@ -52,7 +52,7 @@ void company()
 	printf("-----------------------------------------------------------\n");
 }
 
-void schedule(int flights[])
+void schedule(int flights[]) // Prints updated schedule
 {
 	printf("\t\tF L I G H T   S C H E D U L E\n");
 		printf("-----------------------------------------------------------\n");
@@ -74,7 +74,7 @@ void schedule(int flights[])
 			printf("     %d", 15-flights[2]);
 }
 
-int getFlight(int f)
+int getFlight(int f) // Get user flight input
 {
 	printf("\n\n\tChoose a flight: ");
 	scanf("%d%c", &f);
@@ -82,7 +82,7 @@ int getFlight(int f)
 	return f;
 }
 
-int menu(int f, int flights[])
+int menu(int f, int flights[]) // Menu function
 {
 	company();
 	schedule(flights);
