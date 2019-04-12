@@ -14,15 +14,15 @@ void company(); // Prints company header
 void schedule(int flights[]); // Prints updated schedule
 int getFlight(int f); // Get user flight input
 int menu(int f, int flights[]); // Menu which includes schedule() and getFlight() calls
-void checkFlight(int f, int flights[], int counter, int passengers[], int r); // Checks if flight is full / available
+int checkFlight(int f, int flights[], int counter, int passengers[], int r); // Checks if flight is full / available
 
 int main()
 {
 	// Set console to black text / white background
     system("color f0");
 
-	int flights[3] = {12,15,5}; // test flights
-	//int flights[] = {0,0,0};
+	//int flights[3] = {12,15,5}; // test flights
+	int flights[] = {0,0,0};
 	int passengers[30]; // stores passenger choices in order for report #2
 	int f, r; // user input for flight # and report type
 	bool quit = false; // quits menu loop
@@ -32,7 +32,7 @@ int main()
 	while(quit == false) // quit condition to end program
 	{
 		f = menu(f, flights); // updates user input variable
-		checkFlight(f, flights, counter, passengers,r); // checks if flight is available or full
+		counter = checkFlight(f, flights, counter, passengers,r); // checks if flight is available or full
 
 		// Quit program check
 		printf("Would you like to exit? [Y/N]\n");
@@ -91,7 +91,7 @@ int menu(int f, int flights[]) // Menu function
 }
 
 
-void checkFlight(int f, int flights[], int counter, int passengers[], int r)
+int checkFlight(int f, int flights[], int counter, int passengers[], int r)
 {
 	company();
 	if(flights[(f-1)]<15)
@@ -147,5 +147,5 @@ void checkFlight(int f, int flights[], int counter, int passengers[], int r)
 	{
 		printf("This flight is full\n");
 	}
-	return;
+	return counter;
 }
