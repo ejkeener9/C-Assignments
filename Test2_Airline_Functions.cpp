@@ -24,7 +24,7 @@ int main()
     //int flights[3] = {12,15,5}; // test flights
     int flights[] = {0,0,0};
     int passengersChoicesInOrderForReport2[45];
-    int userInputForFlightNumber;
+    int userInputForFlightNumber = -1;
     bool shouldQuitMenuLoop = false;
     char userInputToQuitProgram;
     int numberOfPassengersEntered = 0;
@@ -39,7 +39,7 @@ int main()
         while(userActuallyWantsQuit == false)
         {
             printf("Would you like to exit? [Y/N]\n");
-            scanf("%c%c", &userInputToQuitProgram);
+            scanf("%c", &userInputToQuitProgram);
             if(userInputToQuitProgram == 'y' || userInputToQuitProgram == 'Y')
             {
                 userActuallyWantsQuit = true;
@@ -96,7 +96,7 @@ int getUserFlightInput(int userInputForFlightNumber) // Get user flight input
     while(validate == false)
     {
         printf("\n\nChoose a flight: ");
-        scanf("%d%c", &userInputForFlightNumber);
+        scanf("%d", &userInputForFlightNumber);
         if((userInputForFlightNumber>0) && (userInputForFlightNumber<4))
         {
             printf("You selected flight %d\n", userInputForFlightNumber);
@@ -131,7 +131,7 @@ int checkIfFlightIsFullOrAvailable(int userInputForFlightNumber, int flights[], 
         while(shouldContinueTakingInput == false)
         {
             printf("Seat %d is availible. Would you like to reserve this seat? [Y/N]\n", (flights[(userInputForFlightNumber-1)])+1);
-            scanf("%c%c",&input);
+            scanf("%c",&input);
             if(input == 'y' || input == 'Y') // user wants to reserve flight
             {
                 shouldContinueTakingInput = true;
@@ -140,7 +140,7 @@ int checkIfFlightIsFullOrAvailable(int userInputForFlightNumber, int flights[], 
                 printf("You have reserved seat %d on Flight %d.\n", flights[(userInputForFlightNumber-1)],userInputForFlightNumber); // prints choice
                 
                 printf("Please choose a report style: \n\t[1] Report by Flight choice     [2] Report by Passenger number\n Report: ");
-                scanf("%d%c", &input);
+                scanf("%c", &input);
                 switch(input)
                 {
                     case 1:
