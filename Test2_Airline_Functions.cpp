@@ -6,24 +6,54 @@
 
 #include "stdafx.h"
 #include <iostream>
-//using namespace System;
+using namespace System;
+
+
+/// Each flight can only hold 15 passengers
+static const int flightMaxPassengerCount = 15;
+/// The smallest valid flight number
+static const int minFlightNumber = 1;
+/// The largest valid flight number
+static const int maxFlightNumber = 3;
+
+
+
+struct OneUserInputForEnteringPassengers {
+    int numberOfPassengersEntered;
+    bool shouldContinueTakingUserInput;
+};
+typedef OneUserInputForEnteringPassengers OneUserInputForEnteringPassengers;
+
+
 
 // Function prototypes
 void printCompanyHeader();
-void printUpdatedSchedule(int flights[]);
-int getUserFlightInput(int userInputForFlightNumber);
-int printMenuAndGetUserFlightNumberSelection(int userInputForFlightNumber, int flights[]); // Menu which includes schedule() and getFlight() calls
-int checkIfFlightIsFullOrAvailable(int userSelectedFlightNumber, int flights[], int numberOfPassengersEntered, int allUserInputsForFlightNumbers[]); // Checks if flight is full / available
+void printUpdatedSchedule(const int flights[]);
 
-void printReportBasedOnUserChoice(int userReportChoice, int numberOfPassengersEntered, int allUserInputsForFlightNumbers[]);
+int getUserFlightInput(const int userInputForFlightNumber);
+const int getFlightNumberFromUser();
+bool isFlightNumberValid(const int flightNumber);
+int printMenuAndGetUserFlightNumberSelection(const int userInputForFlightNumber, const int flights[]); // Menu which includes schedule() and getFlight() calls
+int checkIfFlightIsFullOrAvailable(const int userSelectedFlightNumber, const int flights[], const int numberOfPassengersEntered, const int allUserInputsForFlightNumbers[]); // Checks if flight is full / available
 
-void printReportByFlightChoice(int numberOfPassengersEntered, int allUserInputsForFlightNumbers[]);
-void printReportByOneFlightChoice(int flightNumber, int numberOfPassengersEntered, int allUserInputsForFlightNumbers[]);
-void conditionallyPrintOnePassengerForReportByFlightChoice(int flightNumber, int passengerNumber, int userInputForFlightNumber, int targetUserInput);
-void printOnePassengerForReportByFlightChoice(int flightNumber, int passengerNumber);
+const int takeAllUserInputForEnteringPassengers(const int userInputForFlightNumber, int inoutFlights[], const int numberOfPassengersEnteredSoFar, int inoutAllUserInputsForFlightNumbers[]);
+const OneUserInputForEnteringPassengers takeOneUserInputForEnteringPassengers(const int userInputForFlightNumber, int inoutFlights[], const int numberOfPassengersEnteredSoFar, int inoutAllUserInputsForFlightNumbers[]);
 
-void printReportByPassengerNumber(int numberOfPassengersEntered, int allUserInputsForFlightNumbers[]);
-void printOneFlightForReportByPassengerNumber(int passengerNumber, int userChosenFlightNumber);
+char askUserForChosenAvailableSeat(const int seatNumber);
+char askUserForChosenReportType(const int seatNumber, const int flightNumber);
+void printReportBasedOnUserChoice(const int userReportChoice, const int numberOfPassengersEnteredSoFar, const int allUserInputsForFlightNumbers[]);
+
+void printReportByFlightChoice(const int numberOfPassengersEntered, const int allUserInputsForFlightNumbers[]);
+void printReportByOneFlightChoice(const int flightNumber, const int numberOfPassengersEntered, const int allUserInputsForFlightNumbers[]);
+void conditionallyPrintOnePassengerForReportByFlightChoice(const int flightNumber, const int passengerNumber, const int userInputForFlightNumber, const int targetUserInput);
+void printOnePassengerForReportByFlightChoice(const int flightNumber, const int passengerNumber);
+
+void printReportByPassengerNumber(const int numberOfPassengersEntered, const int allUserInputsForFlightNumbers[]);
+void printOneFlightForReportByPassengerNumber(const int passengerNumber, const int userChosenFlightNumber);
+
+void quit();
+bool userInputIndicatesYes(const char input);
+bool userInputIndicatesNo(const char input);
 
 
 
@@ -48,17 +78,18 @@ int main()
         numberOfPassengersEntered = checkIfFlightIsFullOrAvailable(userInputForFlightNumber, flights, numberOfPassengersEntered, passengersChoicesInOrderForReport2); // checks if flight is available or full
         
         bool userActuallyWantsQuit = false; // validates Quit input
-                                            // Quit program check
+        
+        // Quit program check
         while(userActuallyWantsQuit == false)
         {
             printf("Would you like to exit? [Y/N]\n");
             scanf("%c", &userInputToQuitProgram);
-            if(userInputToQuitProgram == 'y' || userInputToQuitProgram == 'Y')
+            if (userInputIndicatesYes(userInputToQuitProgram))
             {
                 userActuallyWantsQuit = true;
                 shouldQuitMenuLoop = true;
             }
-            else if(userInputToQuitProgram == 'n' || userInputToQuitProgram == 'N')
+            else if (userInputIndicatesNo(userInputToQuitProgram))
             {
                 userActuallyWantsQuit = true;
             }
@@ -70,6 +101,7 @@ int main()
     }
 } // end Main
 
+
 // Begin printCompanyHeader()
 void printCompanyHeader() // Prints Company header
 {
@@ -79,8 +111,9 @@ void printCompanyHeader() // Prints Company header
     printf("-----------------------------------------------------------\n");
 } //end printCompanyHeader()
 
+
 // Begin schedule()
-void printUpdatedSchedule(int flights[]) // Prints updated schedule
+void printUpdatedSchedule(const int flights[]) // Prints updated schedule
 {
     printf("                F L I G H T   S C H E D U L E\n");
     printf("-----------------------------------------------------------\n");
@@ -108,15 +141,15 @@ void printUpdatedSchedule(int flights[]) // Prints updated schedule
     }
 }// end schedule()
 
+
 // Begin getUserFlightInput()
-int getUserFlightInput(int userInputForFlightNumber) // Get user flight input
+int getUserFlightInput(const int userInputForFlightNumber) // Get user flight input
 {
     bool validate = false;
     while(validate == false)
     {
-        printf("\n\nChoose a flight: ");
-        scanf("%d", &userInputForFlightNumber);
-        if((userInputForFlightNumber>0) && (userInputForFlightNumber<4))
+        const int userInputForFlightNumber = getFlightNumberFromUser();
+        if(isFlightNumberValid(userInputForFlightNumber))
         {
             printf("You selected flight %d\n", userInputForFlightNumber);
             validate = true;
@@ -130,62 +163,122 @@ int getUserFlightInput(int userInputForFlightNumber) // Get user flight input
     return userInputForFlightNumber;
 } // end getFlight()
 
+
+bool isFlightNumberValid(const int flightNumber) {
+    return (flightNumber >= minFlightNumber)
+        && (flightNumber <= maxFlightNumber);
+}
+
+
+const int getFlightNumberFromUser() {
+    int userInputForFlightNumber = -1;
+    printf("\n\nChoose a flight: ");
+    scanf("%d", &userInputForFlightNumber);
+    return userInputForFlightNumber;
+}
+
+
 // Begin printMenuAndGetUserFlightNumberSelection()
-int printMenuAndGetUserFlightNumberSelection(int userInputForFlightNumber, int flights[]) // Menu function
+int printMenuAndGetUserFlightNumberSelection(const int userInputForFlightNumber, const int flights[]) // Menu function
 {
     printCompanyHeader();
     printUpdatedSchedule(flights);
-    userInputForFlightNumber = getUserFlightInput(userInputForFlightNumber);
-    return userInputForFlightNumber;
+    return getUserFlightInput(userInputForFlightNumber);
 } // end 2printMenuAndGetUserFlightNumberSelection()
 
+
 // Begin checkIfFlightIsFullOrAvailable()
-int checkIfFlightIsFullOrAvailable(int userInputForFlightNumber, int flights[], int numberOfPassengersEntered, int allUserInputsForFlightNumbers[]) // validates number of passengers
+int checkIfFlightIsFullOrAvailable(const int userInputForFlightNumber, int inoutFlights[], const int numberOfPassengersEnteredSoFar, int inoutAllUserInputsForFlightNumbers[]) // validates number of passengers
 {
     printCompanyHeader();
-    if(flights[(userInputForFlightNumber-1)]<15) // flight can only hold 15 passengers
+    if(inoutFlights[(userInputForFlightNumber-1)] < flightMaxPassengerCount)
     {
-        char input; // input variable to check if user would like to reserve a seat on chosen flight
-        bool shouldContinueTakingInput = false;
-        while(shouldContinueTakingInput == false)
-        {
-            printf("Seat %d is availible. Would you like to reserve this seat? [Y/N]\n", (flights[(userInputForFlightNumber-1)])+1);
-            scanf("%c",&input);
-            if(input == 'y' || input == 'Y') // user wants to reserve flight
-            {
-                shouldContinueTakingInput = true;
-                allUserInputsForFlightNumbers[numberOfPassengersEntered] = userInputForFlightNumber; // updates passengers[] which stores flight choices in order
-                flights[(userInputForFlightNumber-1)]++; // increases total number of passengers on chosen flight
-                printf("You have reserved seat %d on Flight %d.\n", flights[(userInputForFlightNumber-1)],userInputForFlightNumber); // prints choice
-                
-                printf("Please choose a report style: \n\t[1] Report by Flight choice     [2] Report by Passenger number\n Report: ");
-                scanf("%c", &input);
-                printReportBasedOnUserChoice(input, numberOfPassengersEntered, allUserInputsForFlightNumbers);
-                numberOfPassengersEntered++;
-            }
-            else if((input == 'n') || (input == 'N'))
-            {
-                shouldContinueTakingInput = true;
-            }
-            else
-            {
-                printf("Please enter Y for Yes or N for No.\n");
-                shouldContinueTakingInput = false;
-            }
-        }
+        return takeAllUserInputForEnteringPassengers(userInputForFlightNumber, inoutFlights, numberOfPassengersEnteredSoFar, inoutAllUserInputsForFlightNumbers);
     }
     else
     {
         printf("This flight is full\n");
+        return numberOfPassengersEnteredSoFar;
     }
-    return numberOfPassengersEntered;
 } // end checkIfFlightIsFullOrAvailable()
+
+
+const int takeAllUserInputForEnteringPassengers(const int userInputForFlightNumber, int inoutFlights[], const int numberOfPassengersEnteredSoFar, int inoutAllUserInputsForFlightNumbers[]) {
+    OneUserInputForEnteringPassengers runningResult = {
+        numberOfPassengersEnteredSoFar,
+        false
+    };
+    
+    while(runningResult.shouldContinueTakingUserInput == false)
+    {
+        runningResult = takeOneUserInputForEnteringPassengers(userInputForFlightNumber, inoutFlights, numberOfPassengersEnteredSoFar, inoutAllUserInputsForFlightNumbers);
+    }
+    
+    return runningResult.numberOfPassengersEntered;
+}
+
+
+const OneUserInputForEnteringPassengers takeOneUserInputForEnteringPassengers(const int userInputForFlightNumber, int inoutFlights[], const int numberOfPassengersEnteredSoFar, int inoutAllUserInputsForFlightNumbers[]) {
+    OneUserInputForEnteringPassengers result = {
+        numberOfPassengersEnteredSoFar,
+        false
+    };
+    
+    char userInput = askUserForChosenAvailableSeat((inoutFlights[(userInputForFlightNumber-1)])+1);
+    
+    if (userInputIndicatesYes(userInput)) // user wants to reserve flight
+    {
+        result.shouldContinueTakingUserInput = true;
+        inoutAllUserInputsForFlightNumbers[result.numberOfPassengersEntered] = userInputForFlightNumber; // updates passengers[] which stores flight choices in order
+        const int newSeatNumber = ++inoutFlights[(userInputForFlightNumber-1)]; // increases total number of passengers on chosen flight
+        userInput = askUserForChosenReportType(newSeatNumber, userInputForFlightNumber);
+        printReportBasedOnUserChoice(userInput, result.numberOfPassengersEntered, inoutAllUserInputsForFlightNumbers);
+        result.numberOfPassengersEntered++;
+    }
+    else if (userInputIndicatesNo(userInput))
+    {
+        result.shouldContinueTakingUserInput = true;
+    }
+    else
+    {
+        printf("Please enter Y for Yes or N for No.\n");
+        result.shouldContinueTakingUserInput = false;
+    }
+    
+    return result;
+}
+
+
+char askUserForChosenAvailableSeat(const int seatNumber) {
+    char input = 0;
+    printf("Seat %d is availible. Would you like to reserve this seat? [Y/N]\n", seatNumber);
+    const int numberOfInputsScanned = scanf("%c", &input);
+    if (EOF == numberOfInputsScanned) {
+        // User chose to input nothing, usually meaning they are done using our program
+        quit();
+    }
+    return input;
+}
 
 
 
 // MARK: - Reports
 
-void printReportBasedOnUserChoice(int userReportChoice, int numberOfPassengersEntered, int allUserInputsForFlightNumbers[]) {
+char askUserForChosenReportType(const int seatNumber, const int flightNumber) {
+    char input = 0;
+    printf("You have reserved seat %d on Flight %d.\n", seatNumber, flightNumber);
+    
+    printf("Please choose a report style: \n\t[1] Report by Flight choice     [2] Report by Passenger number\n Report: ");
+    const int numberOfInputsScanned = scanf("%c", &input);
+    if (EOF == numberOfInputsScanned) {
+        // User chose to input nothing, usually meaning they are done using our program
+        quit();
+    }
+    return input;
+}
+
+
+void printReportBasedOnUserChoice(const int userReportChoice, const int numberOfPassengersEntered, const int allUserInputsForFlightNumbers[]) {
     switch(userReportChoice)
     {
         case 1:
@@ -206,7 +299,7 @@ void printReportBasedOnUserChoice(int userReportChoice, int numberOfPassengersEn
 
 // MARK: Report by Flight Choice
 
-void printReportByFlightChoice(int numberOfPassengersEntered, int allUserInputsForFlightNumbers[]) {
+void printReportByFlightChoice(const int numberOfPassengersEntered, const int allUserInputsForFlightNumbers[]) {
     printf("Flight Choice\t Passenger Number\n");
     printReportByOneFlightChoice(1, numberOfPassengersEntered, allUserInputsForFlightNumbers);
     printReportByOneFlightChoice(2, numberOfPassengersEntered, allUserInputsForFlightNumbers);
@@ -214,7 +307,7 @@ void printReportByFlightChoice(int numberOfPassengersEntered, int allUserInputsF
 }
 
 
-void printReportByOneFlightChoice(int flightNumber, int numberOfPassengersEntered, int allUserInputsForFlightNumbers[]) {
+void printReportByOneFlightChoice(const int flightNumber, const int numberOfPassengersEntered, const int allUserInputsForFlightNumbers[]) {
     for(int eachPassenger = 0;
         eachPassenger < numberOfPassengersEntered + 1;
         eachPassenger++) {
@@ -223,21 +316,21 @@ void printReportByOneFlightChoice(int flightNumber, int numberOfPassengersEntere
 }
 
 
-void conditionallyPrintOnePassengerForReportByFlightChoice(int flightNumber, int passengerNumber, int allUserInputsForFlightNumbers, int targetUserInput) {
+void conditionallyPrintOnePassengerForReportByFlightChoice(const int flightNumber, const int passengerNumber, const int allUserInputsForFlightNumbers, const int targetUserInput) {
     if (allUserInputsForFlightNumbers == targetUserInput) {
         printOnePassengerForReportByFlightChoice(flightNumber, passengerNumber);
     }
 }
 
 
-void printOnePassengerForReportByFlightChoice(int flightNumber, int passengerNumber) {
+void printOnePassengerForReportByFlightChoice(const int flightNumber, const int passengerNumber) {
     printf("Flight %d\t %d\n", flightNumber, passengerNumber);
 }
 
 
 // MARK: Report by passenger number
 
-void printReportByPassengerNumber(int numberOfPassengersEntered, int allUserInputsForFlightNumbers[]) {
+void printReportByPassengerNumber(const int numberOfPassengersEntered, const int allUserInputsForFlightNumbers[]) {
     printf("Passenger Number\t Flight Choice\n");
     for(int eachPassenger = 0;
         eachPassenger < numberOfPassengersEntered + 1;
@@ -247,7 +340,29 @@ void printReportByPassengerNumber(int numberOfPassengersEntered, int allUserInpu
 }
 
 
-void printOneFlightForReportByPassengerNumber(int passengerNumber, int userChosenFlightNumber) {
+void printOneFlightForReportByPassengerNumber(const int passengerNumber, const int userChosenFlightNumber) {
     printf("%d\t\t\t Flight %d\n", passengerNumber, userChosenFlightNumber);
 }
 
+
+
+// MARK: - General utilities
+
+void quit() {
+    exit(0);
+}
+
+
+bool isUserInputEqualIgnoringCase(const char expectedInput, const char actualInput) {
+    return tolower(expectedInput) == tolower(actualInput);
+}
+
+
+bool userInputIndicatesYes(const char input) {
+    return isUserInputEqualIgnoringCase('y', input);
+}
+
+
+bool userInputIndicatesNo(const char input) {
+    return isUserInputEqualIgnoringCase('n', input);
+}
